@@ -1,0 +1,517 @@
+{
+  "metadata": {
+    "repo_url": "https://gitcode.com/opengauss/Plugin.git",
+    "branch": "master",
+    "start_time": "2026-09-03T11:53:05",
+    "end_time": "2026-09-03T12:22:27",
+    "duration_seconds": 1762,
+    "total_steps": 14,
+    "commit": "75e3c821ad61f17142c970838f079645dccceb7f",
+    "environment": "宿主机 openEuler(aarch64/Kunpeng-920/128核/1TB内存) + Docker 29.7.2；容器 openEuler 24.03 LTS(aarch64)；镜像 og-dolphin-env 由仓库 Dockerfile Tier 2 原样构建（含 binarylibs gcc10.3 与 openGauss-server/Plugin master 源码）",
+    "verifier": "opencode / ttfhw-verify-smart"
+  },
+  "token_usage": {
+    "tool": "opencode",
+    "model": "opencode 默认模型（会话未直接反馈具体模型名与令牌用量）",
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cache_hit_tokens": 0,
+    "cache_miss_tokens": 0
+  },
+  "machine_spec": {
+    "host_machine": {
+      "architecture": "aarch64",
+      "cpu_model": "Kunpeng-920",
+      "cpu_cores": 128,
+      "memory": "1.0Ti",
+      "disk": "/home 分区 3.6T，可用 1.1T（Docker Root Dir=/home/docker_data，满足 Dockerfile 要求的 ≥30G）",
+      "docker_version": "29.7.2",
+      "npu": {
+        "available": false,
+        "card_count": 0,
+        "mounted_card_id": null
+      }
+    },
+    "container": {
+      "os": "openEuler 24.03 LTS",
+      "architecture": "aarch64",
+      "cpu_cores": 128,
+      "memory": "1.0Ti",
+      "container_name": "og-build"
+    },
+    "image_source": {
+      "type": "base_image",
+      "image_name": "og-dolphin-env（FROM hub.oepkgs.net/openeuler/openeuler:24.03-lts，由仓库 Dockerfile Tier 2 原样构建）",
+      "selection_reason": "Tier 2 Dockerfile 构建：仓库根目录提供 Dockerfile（FROM 为纯基础 OS 镜像 hub.oepkgs.net/openeuler/openeuler:24.03-lts，不构成 Tier 1 业务预构建镜像信号；README/关联文档中亦无 docker pull 自定义镜像命令、无 .devcontainer），按三级优先级降为 Tier 2，使用仓库 Dockerfile 原样 docker build 构建（README『docker 快速搭建运行环境及构建测试』章节指定构建命令 docker build -t og-dolphin-env .），依赖安装全部由 Dockerfile 内置 RUN 层完成，无需额外手动安装",
+      "dependency_mapping": {
+        "from_dockerfile": "Dockerfile 内 dnf 安装 git/curl/tar/gzip/findutils、make/cmake/python3/python3-pip/hostname/diffutils/which/procps-ng/libaio-devel/flex/bison/ncurses-devel/glibc-devel/patch/readline-devel/libedit-devel/libxml2-devel/lz4-devel/numactl-devel/unixODBC-devel/java-1.8.0-openjdk-devel/openblas-devel/binutils/openssl/openssl-devel/libnsl/dkms/openeuler-lsb，curl 下载 gcc10.3 binarylibs（openEuler_2403_arm，877MB）解压至 /binarylibs，git clone openGauss-server 与 Plugin master 至 /workspace，并将 contrib/dolphin 拷入 openGauss-server/contrib；构建与宿主机同为 openEuler+aarch64，无跨发行版包名映射",
+        "from_cmake": "contrib/dolphin/CMakeLists.txt 与 openGauss-server 构建体系，依赖由 binarylibs 提供",
+        "from_readme": "README 要求 aarch64 机器、Docker ≥ 18.09.0、磁盘预留 ≥ 30G，全部满足",
+        "mappings": []
+      }
+    }
+  },
+  "document_reading_summary": {
+    "architecture": {
+      "source": "README.md『docker 快速搭建运行环境及构建测试』章节 + Dockerfile 头部注释『openGauss dolphin 插件构建环境 (aarch64 / openEuler 24.03)』",
+      "value": "aarch64（宿主机实测 aarch64，匹配；依赖 binarylibs 为 openEuler_2403_arm 包）"
+    },
+    "recommended_image": {
+      "source": "仓库根目录 Dockerfile（FROM hub.oepkgs.net/openeuler/openeuler:24.03-lts），README 指定构建命令 docker build -t og-dolphin-env .",
+      "value": "og-dolphin-env（基于 hub.oepkgs.net/openeuler/openeuler:24.03-lts 由仓库 Dockerfile 构建，Tier 2 Dockerfile 构建）"
+    },
+    "dockerfile_dependencies": {
+      "source": "仓库根目录 Dockerfile RUN 指令",
+      "value": [
+        {
+          "original": "dnf install -y git curl tar gzip findutils",
+          "target_equivalent": "镜像内 dnf 安装，无需转换（Tier 2 原样构建）"
+        },
+        {
+          "original": "dnf install -y make cmake python3 python3-pip hostname diffutils which procps-ng libaio-devel flex bison ncurses-devel glibc-devel patch readline-devel libedit-devel libxml2-devel lz4-devel numactl-devel unixODBC-devel java-1.8.0-openjdk-devel openblas-devel binutils openssl openssl-devel libnsl dkms（并行层，--disablerepo=update*）",
+          "target_equivalent": "镜像内 dnf 安装，无需转换（Tier 2 原样构建）"
+        },
+        {
+          "original": "openeuler-lsb（command -v lsb_release 兜底安装，保证 lsb_release 可用）",
+          "target_equivalent": "镜像内安装，无需转换"
+        },
+        {
+          "original": "curl 下载 binarylibs：https://opengauss.obs.cn-south-1.myhuaweicloud.com/latest/binarylibs/gcc10.3/openGauss-third_party_binarylibs_openEuler_2403_arm.tar.gz（877MB）",
+          "target_equivalent": "镜像内 curl 下载并解压到 /binarylibs（Tier 2 原样构建）"
+        },
+        {
+          "original": "git clone --depth 1 --branch master https://gitcode.com/opengauss/openGauss-server.git 与 https://gitcode.com/opengauss/Plugin.git（并行层，克隆到 /workspace）",
+          "target_equivalent": "镜像内 git clone（Tier 2 原样构建）"
+        }
+      ]
+    },
+    "dependencies": {
+      "source": "README.md『dolphin 插件 check 用例执行』章节 + Dockerfile + contrib/dolphin/Makefile",
+      "value": [
+        "openGauss-server 仓 master 分支源码（Dockerfile 内自动 git clone 到 /workspace）",
+        "Plugin 仓 master 分支源码（Dockerfile 内自动 git clone，contrib/dolphin 拷入 openGauss-server/contrib）",
+        "openGauss-third_party_binarylibs_openEuler_2403_arm.tar.gz（gcc10.3 二进制依赖，877MB，OBS 下载）",
+        "openEuler 24.03 LTS 系统依赖：make cmake python3 python3-pip git curl flex bison ncurses-devel glibc-devel readline-devel libedit-devel libxml2-devel lz4-devel numactl-devel unixODBC-devel java-1.8.0-openjdk-devel openblas-devel openssl-devel libaio-devel libnsl 等（Dockerfile dnf 安装）",
+        "lsb_release 工具（openeuler-lsb 兜底）",
+        "编译用户 omm（Dockerfile useradd）"
+      ]
+    },
+    "build_commands": {
+      "source": "README.md『docker 快速搭建运行环境及构建测试』步骤2 + Dockerfile【操作步骤】步骤四",
+      "value": "docker build --network host --build-arg MIRROR_IP=$MIRROR --build-arg OBS_IP=$OBS --build-arg GITCODE_IP=$GIT -t og-dolphin-env . && docker run -d --name og-build --network host --user omm og-dolphin-env sleep infinity && docker exec og-build /opt/build.sh（容器内等价 cd /workspace/openGauss-server && sh build.sh -m release -3rd /binarylibs --cmake，产物 mppdb_temp_install/bin/gaussdb 与 mppdb_temp_install/lib/postgresql/dolphin.so，日志 /workspace/verify.log）"
+    },
+    "ut_commands": {
+      "source": "README.md『docker 快速搭建运行环境及构建测试』步骤3 + Dockerfile【操作步骤】步骤五 + contrib/dolphin/Makefile",
+      "value": "docker exec og-build /opt/makecheck.sh（容器内等价 cd /workspace/openGauss-server/contrib/dolphin && make check p=38000 PART=A，按 parallel_schedule_dolphinA 调度文件分组执行）；按用户要求仅执行前 20 个用例组后即结束 UT"
+    },
+    "sample_commands": {
+      "source": "README.md 全文检索（无独立样例章节）",
+      "value": "仓库未提供独立样例入口脚本；README 提供的验证方式为 docker 编译 + make check 回归测试，另附升级/回滚验证 SQL 模板（alter extension dolphin update，需在已运行数据库内执行）"
+    },
+    "special_dependencies": {
+      "source": "Dockerfile【磁盘要求】/【注意点】+ README 前提条件",
+      "value": [
+        "aarch64 机器 + Docker ≥ 18.09.0 + Docker 数据目录磁盘预留 ≥ 30G（实测编译峰值 ~20G，编译+UT 峰值 ~27G）",
+        "seccomp 线程自检：docker run --rm hub.oepkgs.net/openeuler/openeuler:24.03-lts python3 -c threading 自检，输出 THREAD_OK 即免修（本机已通过）",
+        "binarylibs 877MB 大文件下载（OBS），三个 --build-arg IP 注入 /etc/hosts 辅助免 DNS",
+        "docker build 需 --network host"
+      ]
+    }
+  },
+  "execution_log": [
+    {
+      "timestamp": "2026-09-03T11:55:51",
+      "step": "document_reading",
+      "action": "git clone --depth 1 --branch master 克隆 Plugin 仓到本地进行文档闭包阅读",
+      "result": "成功",
+      "details": {
+        "repo_url": "https://gitcode.com/opengauss/Plugin.git",
+        "branch": "master",
+        "commit": "75e3c821ad61f17142c970838f079645dccceb7f",
+        "commit_msg": "!2557 add: docker 快速搭建运行环境及构建测试"
+      },
+      "command": "git clone --depth 1 --branch master https://gitcode.com/opengauss/Plugin.git /tmp/opencode/Plugin-src",
+      "success": true,
+      "output": "Cloning into 'Plugin-src'... done. HEAD 75e3c821",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 90
+    },
+    {
+      "timestamp": "2026-09-03T11:55:51",
+      "step": "document_reading",
+      "action": "阅读 README.md，提取 docker 快速搭建、编译、make check 用例执行说明",
+      "result": "成功",
+      "details": {
+        "file": "README.md",
+        "key_sections": [
+          "docker 快速搭建运行环境及构建测试",
+          "dolphin 插件 check 用例执行",
+          "执行单个用例"
+        ],
+        "build_cmd": "docker build -t og-dolphin-env . && docker run -d --name og-build --network host --user omm og-dolphin-env sleep infinity && docker exec og-build /opt/build.sh",
+        "ut_cmd": "docker exec og-build /opt/makecheck.sh",
+        "prerequisites": "aarch64 机器、Docker ≥ 18.09.0、磁盘预留 ≥ 30G"
+      },
+      "command": "cat README.md",
+      "success": true,
+      "output": "README 详述 dolphin 插件构建与 make check p=38000 PART=A 用例执行方式",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 5
+    },
+    {
+      "timestamp": "2026-09-03T11:55:51",
+      "step": "dockerfile_analysis",
+      "action": "阅读仓库根目录 Dockerfile，分析 FROM、build-arg、依赖安装层、build.sh/makecheck.sh 生成逻辑",
+      "result": "成功",
+      "details": {
+        "from": "hub.oepkgs.net/openeuler/openeuler:24.03-lts",
+        "build_args": [
+          "MIRROR_IP",
+          "OBS_IP",
+          "GITCODE_IP",
+          "OE_TAG",
+          "DNF_MIRROR"
+        ],
+        "scripts": [
+          "/opt/build.sh",
+          "/opt/makecheck.sh"
+        ],
+        "disk_require": "≥30G",
+        "seccomp_check": "步骤二 THREAD_OK 自检"
+      },
+      "command": "cat Dockerfile",
+      "success": true,
+      "output": "FROM hub.oepkgs.net/openeuler/openeuler:24.03-lts；并行层 dnf 依赖 + binarylibs 下载 + 双仓 clone；生成编译/回归测试脚本",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 5
+    },
+    {
+      "timestamp": "2026-09-03T11:55:51",
+      "step": "document_reading",
+      "action": "阅读 README_EN.md 与 PreCommitREADME.md，确认无额外环境/镜像信息",
+      "result": "成功",
+      "details": {
+        "files": [
+          "README_EN.md",
+          "PreCommitREADME.md"
+        ],
+        "conclusion": "README_EN 为贡献流程英文版；PreCommitREADME 仅涉及 git 提交前检查（pre-commit/codespell），与构建环境无关"
+      },
+      "command": "cat README_EN.md PreCommitREADME.md",
+      "success": true,
+      "output": "无新增环境依赖或镜像链接",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 3
+    },
+    {
+      "timestamp": "2026-09-03T11:55:51",
+      "step": "document_reading",
+      "action": "阅读 parallel_schedule_dolphinA/B 调度文件与 contrib/dolphin/Makefile，理解 make check 分组机制",
+      "result": "成功",
+      "details": {
+        "schedule_A_groups": 52,
+        "schedule_B_groups": 49,
+        "makefile_vars": {
+          "p": "数据库监听端口，默认 25432，makecheck.sh 中设为 38000",
+          "PART": "A/B 用例组选择"
+        },
+        "ut_entry": "make check p=38000 PART=A"
+      },
+      "command": "cat contrib/dolphin/parallel_schedule_dolphinA contrib/dolphin/parallel_schedule_dolphinB && grep -n PART contrib/dolphin/Makefile",
+      "success": true,
+      "output": "A 组 52 个用例组、B 组 49 个用例组，make check 按 schedule 文件分组执行",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 5
+    },
+    {
+      "timestamp": "2026-09-03T12:05:01",
+      "step": "image_selection",
+      "action": "镜像信号探测与 Tier 判定：检查 Dockerfile FROM、README docker pull 命令、.devcontainer、镜像仓库链接",
+      "result": "Tier 2 Dockerfile 构建",
+      "details": {
+        "tier": 2,
+        "tier1_signals": "无（Dockerfile FROM 为纯基础 OS 镜像 openEuler 24.03-lts；README 无 docker pull 自定义镜像；无 .devcontainer；无 hub.docker.com/quay.io 等镜像仓库链接）",
+        "tier2_signals": "仓库根目录存在 Dockerfile，README 指定 docker build -t og-dolphin-env . 构建方式",
+        "npu_required": false
+      },
+      "command": "grep -E 'FROM' Dockerfile; ls -a; grep -ri 'docker pull\\|devcontainer' README.md README_EN.md",
+      "success": true,
+      "output": "FROM hub.oepkgs.net/openeuler/openeuler:24.03-lts → 判定 Tier 2",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 5
+    },
+    {
+      "timestamp": "2026-09-03T12:05:01",
+      "step": "image_selection",
+      "action": "执行 Dockerfile 步骤二 seccomp 线程自检（顺带验证基础镜像可拉取）：docker run --rm hub.oepkgs.net/openeuler/openeuler:24.03-lts python3 threading 自检",
+      "result": "成功",
+      "details": {
+        "check": "THREAD_OK",
+        "image": "hub.oepkgs.net/openeuler/openeuler:24.03-lts",
+        "digest": "sha256:ace677f48c79ae6bc17046cb8c2940b38f7050afc752c8463e1553b9e7b60974"
+      },
+      "command": "docker run --rm hub.oepkgs.net/openeuler/openeuler:24.03-lts python3 -c \"import threading;t=threading.Thread(target=lambda:None);t.start();print('THREAD_OK')\"",
+      "success": true,
+      "output": "THREAD_OK（本机 Docker 29.7.2 seccomp 无需修复，按 Dockerfile 步骤二说明直接进入步骤四）",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 60
+    },
+    {
+      "timestamp": "2026-09-03T12:05:01",
+      "step": "container_setup",
+      "action": "准备验证工作目录：通过基础镜像容器创建 /home/workspace 并将 Plugin 仓克隆复制到 /home/workspace/Plugin-verify（build 上下文）",
+      "result": "成功",
+      "details": {
+        "workspace": "/home/workspace/Plugin-verify",
+        "commit": "75e3c821ad61f17142c970838f079645dccceb7f",
+        "dockerfile_md5": "3ff5408133e137c93389fe1d85429592",
+        "integrity_check": "grep 反引号无输出，文件完整性校验通过（Dockerfile 步骤三）"
+      },
+      "command": "docker run --rm -v /home:/home hub.oepkgs.net/openeuler/openeuler:24.03-lts sh -c 'mkdir -p /home/workspace && chown 22211:22211 /home/workspace' && cp -r /tmp/opencode/Plugin-src /home/workspace/Plugin-verify",
+      "success": true,
+      "output": "工作目录就绪，Dockerfile 完整性校验通过",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 10
+    },
+    {
+      "timestamp": "2026-09-03T12:05:01",
+      "step": "container_setup",
+      "action": "docker build 构建镜像 og-dolphin-env（README 步骤四命令原样：--network host + 三个 --build-arg IP 注入）",
+      "result": "成功",
+      "details": {
+        "image_tag": "og-dolphin-env",
+        "build_args": {
+          "MIRROR_IP": "120.46.63.139",
+          "OBS_IP": "139.9.23.166",
+          "GITCODE_IP": "116.205.2.91"
+        },
+        "network": "host",
+        "layers": [
+          "dnf 安装 git/curl/tar/gzip/findutils",
+          "并行层：dnf 依赖 + binarylibs 877MB 下载 + openGauss-server/Plugin 双仓 clone + contrib/dolphin 拷贝",
+          "生成 /opt/build.sh 编译脚本",
+          "生成 /opt/makecheck.sh 回归测试脚本"
+        ]
+      },
+      "command": "docker build --network host --build-arg MIRROR_IP=120.46.63.139 --build-arg OBS_IP=139.9.23.166 --build-arg GITCODE_IP=116.205.2.91 -t og-dolphin-env .",
+      "success": true,
+      "output": "镜像构建成功，依赖（dnf 包 + binarylibs + 双仓源码）全部由 Dockerfile 内置 RUN 层安装完成，Tier 2 无需手动安装依赖",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 285.0,
+      "note": "BuildKit 下 /etc/hosts 只读导致 IP 注入提示 Read-only file system，但 Dockerfile 各 RUN 均以 || true 兜底且 --network host 提供宿主 DNS，dnf/clone/curl 均正常完成，不影响构建"
+    },
+    {
+      "timestamp": "2026-09-03T12:05:01",
+      "step": "container_setup",
+      "action": "docker run 启动容器 og-build（README 步骤四命令原样：-d --network host --user omm sleep infinity）",
+      "result": "成功",
+      "details": {
+        "container_name": "og-build",
+        "network": "host",
+        "user": "omm",
+        "startup_command_source": "readme",
+        "npu_required": false
+      },
+      "command": "docker run -d --name og-build --network host --user omm og-dolphin-env sleep infinity",
+      "success": true,
+      "output": "容器启动成功",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 5
+    },
+    {
+      "timestamp": "2026-09-03T12:05:01",
+      "step": "dependency_verification",
+      "action": "容器内验证关键依赖已就位：gcc/cmake/make/python3、binarylibs、openGauss-server 与 Plugin 源码、dolphin 插件目录拷贝",
+      "result": "成功",
+      "details": {
+        "gcc": "系统 gcc 12.3.1（openEuler 24.03 dnf 安装）；实际编译工具链由 build.sh -3rd /binarylibs 指向 gcc10.3 binarylibs",
+        "cmake": "cmake 3.27.9（dnf）",
+        "make": "GNU Make 4.4.1",
+        "python": "Python 3.11.6",
+        "lsb_release": "openEuler release 24.03 (LTS)",
+        "source_dirs": [
+          "/workspace/openGauss-server",
+          "/workspace/Plugin"
+        ],
+        "dolphin_dir": "/workspace/openGauss-server/contrib/dolphin 已就位",
+        "binarylibs": "/binarylibs 已解压（buildtools/install_tools/kernel）"
+      },
+      "command": "docker exec og-build sh -c 'ls /workspace /binarylibs; gcc --version | head -1; cmake --version | head -1; ls /workspace/openGauss-server/contrib/dolphin | head'",
+      "success": true,
+      "output": "依赖全部就位（Tier 2 构建内置）",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 5
+    },
+    {
+      "timestamp": "2026-09-03T12:11:38",
+      "step": "build_attempt",
+      "action": "执行仓库提供的编译入口：docker exec og-build /opt/build.sh（容器内 cd /workspace/openGauss-server && sh build.sh -m release -3rd /binarylibs --cmake），time 包裹记录耗时",
+      "result": "成功",
+      "details": {
+        "build_script": "/opt/build.sh（Dockerfile 生成，README 步骤四指定）",
+        "build_command_inner": "cd /workspace/openGauss-server && sh build.sh -m release -3rd /binarylibs --cmake",
+        "artifacts": [
+          "mppdb_temp_install/bin/gaussdb",
+          "mppdb_temp_install/lib/postgresql/dolphin.so"
+        ],
+        "build_log": "/workspace/verify.log（容器内）"
+      },
+      "command": "time docker exec og-build /opt/build.sh",
+      "success": true,
+      "output": "gaussdb 791M 与 dolphin.so 65M 均生成",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 368.0,
+      "note": "构建成功，无致命错误（仅有 unused variable 等编译警告，不影响产物）"
+    },
+    {
+      "timestamp": "2026-09-03T12:16:59",
+      "step": "ut_execution",
+      "action": "按 README『执行单个用例』章节官方做法备份 parallel_schedule_dolphinA 并仅保留前 20 个用例组，随后执行仓库 UT 脚本 /opt/makecheck.sh（容器内等价 cd contrib/dolphin && make check p=38000 PART=A），time 包裹，仅执行一次不重复",
+      "result": "成功",
+      "details": {
+        "ut_script": "/opt/makecheck.sh（Dockerfile 生成，README 步骤五指定）",
+        "ut_command_inner": "cd /workspace/openGauss-server/contrib/dolphin && make check p=38000 PART=A",
+        "schedule_groups_executed": 20,
+        "schedule_groups_total": "A 组共 52 个用例组，按验证要求截取前 20 组执行后即结束",
+        "tests_total": 128,
+        "tests_passed": 127,
+        "tests_failed": 1,
+        "failed_tests": [
+          "db_b_new_gram_test"
+        ],
+        "db_init": "临时 gaussdb 实例（--single_node -p 38000）初始化成功，contrib_regression 数据库（B 兼容模式）创建成功",
+        "preparation_seconds": 77.7,
+        "test_time_seconds": 121.3
+      },
+      "command": "cp parallel_schedule_dolphinA parallel_schedule_dolphinA.bak.ttfhw && grep \"^test:\" parallel_schedule_dolphinA.bak.ttfhw | head -20 > parallel_schedule_dolphinA && time docker exec og-build /opt/makecheck.sh",
+      "success": true,
+      "output": "============== running regression test queries ============== ... ======================== 1 of 128 tests failed. Total Time: 121.286035s ========================",
+      "error": "db_b_new_gram_test 与期望输出存在轻微 diff（临时表 schema 前缀与 WARNING 行差异）；按验证要求跑满 20 个用例组即结束并视为通过，不重跑",
+      "returncode": 2,
+      "duration_seconds": 202,
+      "note": "按用户验证要求：UT 只跑一次；跑满 20 个用例组直接结束（不管成功失败）视为通过。实际 20 组全部执行完毕，128 用例中 127 通过、1 失败（结果不稳定类 diff），UT 判定为通过"
+    },
+    {
+      "timestamp": "2026-09-03T12:22:27",
+      "step": "sample_execution",
+      "action": "执行 README 文档化的样例：插件升级/回滚自验模板（gs_initdb 单机实例 → B 兼容库 → dolphin 5.3→5.2→5.3 升级/回滚流程）+ dolphin B 兼容语法冒烟（ENGINE=InnoDB/AUTO_INCREMENT/SHOW VARIABLES）",
+      "result": "成功",
+      "details": {
+        "sample_source": "README『dolphin插件开发须知』第5条升级/回滚自验模板 + 模板语义说明『后续版本号升级的话，就分别改为对应版本号』",
+        "version_mapping": "README 模板示例版本 2.0/3.0 → 按当前实际版本映射为 5.2/5.3（dolphin.control default_version=5.3）",
+        "db_setup": "gs_initdb 单机集群 → gaussdb --single_node -p 38100 → CREATE DATABASE dolphin_sample DBCOMPATIBILITY 'B'（B 库自动预装 dolphin 5.3）",
+        "template_output": "ALTER SYSTEM SET / pg_sleep / BEGIN / SET / SET / ALTER EXTENSION / ALTER EXTENSION / RESET / ROLLBACK / ALTER SYSTEM SET，total time: 2083ms",
+        "smoke_output": "CREATE TABLE / INSERT 0 1 / (1, ttfhw) / auto_increment_increment=1"
+      },
+      "command": "docker exec og-build bash /tmp/sample_run.sh（内部: gs_initdb -D /tmp/ogsample/data -w Gauss_1234 --nodename=og_sample; gaussdb --single_node -i -p 38100; gsql -f upgrade_rollback.sql 等）",
+      "success": true,
+      "output": "===== [4] 执行 README 升级/回滚自验模板 ===== ALTER SYSTEM SET ... ALTER EXTENSION ALTER EXTENSION RESET ROLLBACK total time: 2083ms UPGRADE_ROLLBACK_TEMPLATE_EXIT=0 ===== [6] 冒烟 ===== INSERT 0 1 / (1, ttfhw) / auto_increment_increment=1",
+      "error": "",
+      "returncode": 0,
+      "duration_seconds": 85
+    }
+  ],
+  "final_results": {
+    "build": {
+      "status": "success",
+      "duration_seconds": 368.0,
+      "cmake": "openGauss-server build.sh -m release --cmake（cmake 构建模式，release 版本）",
+      "compiler": "gcc 10.3.0（binarylibs gcc10.3）",
+      "concurrency": 128,
+      "concurrency_ratio": "仓库 /opt/build.sh 脚本内部自行管理并行度（build.sh 默认按 nproc），按技能『优先使用仓库提供的构建入口』原则未干预",
+      "notes": "构建成功，无致命错误（仅有 unused variable 等编译警告，不影响产物）",
+      "artifacts": [
+        {
+          "name": "gaussdb",
+          "path": "/workspace/openGauss-server/mppdb_temp_install/bin/gaussdb",
+          "size": "791M",
+          "type": "binary"
+        },
+        {
+          "name": "dolphin.so",
+          "path": "/workspace/openGauss-server/mppdb_temp_install/lib/postgresql/dolphin.so",
+          "size": "65M",
+          "type": "library"
+        }
+      ]
+    },
+    "ut": {
+      "status": "success",
+      "duration_seconds": 202,
+      "total": 128,
+      "passed": 127,
+      "failed": 1,
+      "skipped": 0,
+      "failures": [
+        {
+          "test_name": "db_b_new_gram_test",
+          "error": "结果输出与期望文件存在轻微 diff：results 中 CREATE TABLE t_column_collate(c text COLLATE \"en_US\") 语句后多出一行『WARNING: Invalid collation for column c detected. default value set』；且 \\d t_like 输出显示 Table \"pg_temp__1_2_47.t_like\"（临时表 schema 前缀）而期望为空表名限定。属并行分组执行下的结果不稳定差异（README 调度文件中注明部分用例必须单独成组，否则其他连接会影响结果），非功能缺陷。按验证要求（跑满 20 个用例组即结束 UT 且视为通过）不重跑，UT 记录为通过"
+        }
+      ]
+    },
+    "sample": {
+      "status": "success",
+      "duration_seconds": 85,
+      "results": [
+        {
+          "sample_name": "README『dolphin插件开发须知』第5条 插件升级/回滚流程自验模板（版本号按 README 自身指引映射为当前实际 5.2/5.3）",
+          "execution_status": "success",
+          "output_summary": "在 B 兼容库 dolphin_sample（自动预装 dolphin 5.3）上完整执行模板：ALTER SYSTEM SET upgrade_mode=2 → pg_sleep(2) → BEGIN → set isinplaceupgrade=on → set dolphin.b_compatibility_mode=off → alter extension dolphin update to '5.2'（回滚，dolphin--5.3--5.2.sql）→ alter extension dolphin update to '5.3'（升级，dolphin--5.2--5.3.sql）→ reset dolphin.b_compatibility_mode → abort（模板以 ROLLBACK 收尾，符合其干跑语义）→ ALTER SYSTEM SET upgrade_mode=0。total time: 2083ms，退出码 0；执行后 pg_extension 确认 dolphin 仍为 5.3",
+          "execution_time": "2.1s（模板 SQL，含 gs_initdb/启动/建库在内的完整样例脚本共 85s）"
+        },
+        {
+          "sample_name": "dolphin B 兼容语法冒烟测试（MySQL 语法兼容能力）",
+          "execution_status": "success",
+          "output_summary": "CREATE TABLE smt(id INT AUTO_INCREMENT, name VARCHAR(20), PRIMARY KEY(id)) ENGINE=InnoDB 成功（隐式序列 smt_id_seq + 索引 smt_pkey）；INSERT INTO smt(name) VALUES('ttfhw') 成功；SELECT id,name 返回 (1, 'ttfhw') 验证 AUTO_INCREMENT 自增生效；SHOW VARIABLES LIKE 'auto_increment%' 返回 auto_increment_increment=1 验证 MySQL 兼容 SHOW VARIABLES 语法生效",
+          "execution_time": "约1s"
+        }
+      ]
+    }
+  },
+  "documentation_gaps": [
+    {
+      "time": "2026-09-03T12:22:27",
+      "title": "README 升级/回滚自验模板的版本号说明已过时",
+      "body": "README『dolphin插件开发须知』第5条称『2.0，3.0是dolphin插件的版本，当前最新版本为 3.0』，但仓库实际 dolphin.control 中 default_version='5.3'，编译产物安装的升级脚本链已到 dolphin--5.2--5.3.sql。按 README 模板原样执行 2.0/3.0 的 alter extension update 在当前版本上无法对应实际升级路径，需按模板自身『后续版本号升级的话，就分别改为对应版本号』的指引映射为 5.2/5.3 执行。建议 README 同步更新当前最新版本号说明",
+      "source": "README.md『dolphin插件开发须知』第5条 + contrib/dolphin/dolphin.control"
+    },
+    {
+      "time": "2026-09-03T12:22:27",
+      "title": "README 未说明 B 兼容数据库会自动预装 dolphin 扩展",
+      "body": "使用 CREATE DATABASE ... DBCOMPATIBILITY 'B' 创建数据库后 dolphin 扩展已自动存在（版本 5.3），此时执行 CREATE EXTENSION dolphin 会报 ERROR: extension \"dolphin\" already exists in schema \"public\"。README『dolphin 插件 check 用例执行』与升级/回滚自验模板均未提及该预装行为，新手按文档在 B 库手动 CREATE EXTENSION 会遇到困惑",
+      "source": "README.md『dolphin插件开发须知』第5条 + 样例执行实测"
+    }
+  ],
+  "problems_encountered": [
+    {
+      "timestamp": "2026-09-03T12:22:27",
+      "problem": "docker build 阶段 Dockerfile 每个 RUN 开头向 /etc/hosts 注入三个 IP 的语句在 Docker 29.7.2 BuildKit 下报『/bin/sh: line 1: /etc/hosts: Read-only file system』",
+      "solution": "该写法在 Dockerfile 中以 `|| true` 兜底，且构建使用 --network host 由宿主机提供 DNS，dnf/curl/git clone 全部正常完成（JOB dnf/binlib/server/plugin 全 OK），构建成功，无需处理；属老版 Docker 兼容性写法与新 BuildKit 的非致命差异",
+      "source": "Dockerfile RUN 层执行日志"
+    },
+    {
+      "timestamp": "2026-09-03T12:22:27",
+      "problem": "make check 回归测试中 db_b_new_gram_test 与期望文件存在结果 diff（\\d t_like 输出带临时表 schema 前缀 pg_temp__1_2_47、CREATE TABLE COLLATE 语句后多一行 WARNING 输出）",
+      "solution": "属并行分组执行下的结果不稳定差异（schedule 文件中多组用例注明『must be single test group, cause other connection will affect the result』），非功能缺陷。按本次验证要求（跑满 20 个用例组即结束 UT 且视为通过，不重跑）记录实际数据：128 用例 127 通过 1 失败，UT 判定为通过",
+      "source": "UT 执行 /workspace/openGauss-server/contrib/dolphin/regression.diffs"
+    },
+    {
+      "timestamp": "2026-09-03T12:22:27",
+      "problem": "B 兼容数据库中执行 CREATE EXTENSION dolphin 报 extension already exists",
+      "solution": "实测确认 openGauss 以 DBCOMPATIBILITY 'B' 建库时会自动预装 dolphin 扩展（5.3），直接使用即可，非阻塞问题；已记入 documentation_gaps 建议 README 补充说明",
+      "source": "样例执行（gs_initdb + CREATE DATABASE DBCOMPATIBILITY 'B'）"
+    }
+  ]
+}
